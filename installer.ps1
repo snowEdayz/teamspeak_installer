@@ -91,22 +91,25 @@ function uninstallOverwolf {
     }
 
     foreach ($entry in $overwolfEntries) {
+        $uninstallCmd = $null
+
         if ($entry.QuietUninstallString) {
             Write-Host "执行静默卸载：$($entry.DisplayName)" -ForegroundColor Yellow
-            Start-Process -FilePath "cmd.exe" -ArgumentList "/c $($entry.QuietUninstallString)" -Wait
-        }
-        elseif ($entry.UninstallString) {
+            $uninstallCmd = $entry.QuietUninstallString
+        } elseif ($entry.UninstallString) {
             Write-Host "执行卸载：$($entry.DisplayName)" -ForegroundColor Yellow
             $uninstallCmd = $entry.UninstallString
             if ($uninstallCmd -notmatch "(?i)/quiet|/qn|/s") {
                 if ($uninstallCmd -match "msiexec") {
                     $uninstallCmd = "$uninstallCmd /qn"
-                }
-                else {
+                } else {
                     $uninstallCmd = "$uninstallCmd /S"
                 }
             }
-            Start-Process -FilePath "cmd.exe" -ArgumentList "/c $uninstallCmd" -Wait
+        }
+
+        if ($uninstallCmd) {
+            Start-Process -FilePath "cmd.exe" -ArgumentList @('/c', $uninstallCmd) -Wait
         }
     }
 }
