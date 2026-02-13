@@ -137,22 +137,3 @@ Write-Host ""
 Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 Write-Host "* [1]安装 TS3 > [2]安装汉化包 > [3] 完成" -ForegroundColor Green
 Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
-function choiceClean {
-    $readClean = Read-Host "是否要清理本地安装包？[Y/n]"
-    Switch ($readClean) {
-        Y { $readCleanChoice = $true }
-        N { $readCleanChoice = $false }
-        Default {
-            Write-Warning "未知选项，使用默认选项：是（Y）。"
-            $readCleanChoice = $true
-        }
-    }
-    return $readCleanChoice
-}
-
-if (choiceClean) {
-    Write-Warning "正在删除 $Global:clientPath…"
-    Remove-Item "$Global:clientPath"
-    Write-Warning "正在删除 $Global:zhCNTranslationPath…"
-    Remove-Item "$Global:zhCNTranslationPath"
-}
