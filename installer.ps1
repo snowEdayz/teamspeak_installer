@@ -5,6 +5,9 @@
     .DESCRIPTION
     一个从脚本同目录读取安装包并安装 TeamSpeak 3 客户端与汉化包的脚本。
 
+    .PARAMETER ts3FileHost
+    为 files.teamspeak-services.com 使用反向代理。
+
     .PARAMETER location
     指定 TeamSpeak 3 客户端的安装路径。
 
@@ -116,10 +119,10 @@ Write-Host "------------------------------------------------------------" -Foreg
 getInstallerFiles
 Write-Host "正在启动自动安装向导。安装位置为：$location、仅为本用户安装：$currentUser…" -ForegroundColor Yellow
 if ($currentUser) {
-    Start-Process -FilePath $Global:clientFilePath -ArgumentList @("/CurrentUser", "/S", "/D=$location") -Wait
+    Invoke-Expression -Command "`"$Global:clientFilePath`" /CurrentUser /S /D=$location"
     $shortcutLocation = [Environment]::GetFolderPath("Desktop") + "\TeamSpeak 3 Client.lnk"
 } else {
-    Start-Process -FilePath $Global:clientFilePath -ArgumentList @("/S", "/D=$location") -Wait
+    Invoke-Expression -Command "`"$Global:clientFilePath`" /S /D=$location"
     $shortcutLocation = [Environment]::GetFolderPath("CommonDesktopDirectory") + "\TeamSpeak 3 Client.lnk"
 }
 Write-Host "正在安装中，请稍后…" -ForegroundColor Yellow
@@ -127,7 +130,7 @@ while (!(Test-Path "$shortcutLocation")) {
     Start-Sleep 1
 }
 Write-Host "安装结束，正在启动 TeamSpeak 3…" -ForegroundColor Green
-Start-Process -FilePath $shortcutLocation
+Invoke-Expression -Command "& '$shortcutLocation'"
 uninstallOverwolf
 
 Write-Host ""
@@ -135,7 +138,7 @@ Write-Host "------------------------------------------------------------" -Foreg
 Write-Host "* [1]安装 TS3 > [2]安装汉化包 > [3] 完成" -ForegroundColor Green
 Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 Write-Host "正在启动汉化包安装向导。请手动互动界面来安装汉化包…" -ForegroundColor Green
-Start-Process -FilePath $Global:zhCNTranslationFilePath
+Invoke-Expression -Command "`"$Global:zhCNTranslationFilePath`""
 
 Write-Host ""
 Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
