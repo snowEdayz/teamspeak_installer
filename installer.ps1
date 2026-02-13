@@ -52,7 +52,17 @@ if ([System.Environment]::OSVersion.Platform -ne "Win32NT") {
 }
 
 function getInstallerFiles {
-    $Global:scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $scriptDir = if ($PSScriptRoot) {
+        $PSScriptRoot
+    }
+    elseif ($PSCommandPath) {
+        Split-Path -Parent $PSCommandPath
+    }
+    else {
+        (Get-Location).Path
+    }
+
+    $Global:scriptDir = $scriptDir
     $Global:clientFileName = "ts.exe"
     $Global:zhCNTranslationFileName = "Chinese_Translation_zh-CN.ts3_translation"
     $Global:clientFilePath = Join-Path $Global:scriptDir $Global:clientFileName
@@ -73,6 +83,12 @@ function getInstallerFiles {
 }
 
 function uninstallOverwolf {
+    $confirmUninstall = Read-Host "是否尝试卸载已安装的 Overwolf 组件？这可能影响其他游戏集成。[y/N]"
+    if ($confirmUninstall -notmatch '^(?i)y(es)?$') {
+        Write-Host "已跳过 Overwolf 卸载。" -ForegroundColor Green
+        return
+    }
+
     Write-Host "正在检查并卸载 Overwolf（如果已安装）…" -ForegroundColor Yellow
     $keys = @(
         "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*",
