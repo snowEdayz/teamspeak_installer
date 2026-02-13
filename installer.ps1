@@ -91,22 +91,25 @@ function uninstallOverwolf {
     }
 
     foreach ($entry in $overwolfEntries) {
+        $uninstallCmd = $null
+
         if ($entry.QuietUninstallString) {
             Write-Host "执行静默卸载：$($entry.DisplayName)" -ForegroundColor Yellow
-            Start-Process -FilePath "cmd.exe" -ArgumentList "/c $($entry.QuietUninstallString)" -Wait
-        }
-        elseif ($entry.UninstallString) {
+            $uninstallCmd = $entry.QuietUninstallString
+        } elseif ($entry.UninstallString) {
             Write-Host "执行卸载：$($entry.DisplayName)" -ForegroundColor Yellow
             $uninstallCmd = $entry.UninstallString
             if ($uninstallCmd -notmatch "(?i)/quiet|/qn|/s") {
                 if ($uninstallCmd -match "msiexec") {
                     $uninstallCmd = "$uninstallCmd /qn"
-                }
-                else {
+                } else {
                     $uninstallCmd = "$uninstallCmd /S"
                 }
             }
-            Start-Process -FilePath "cmd.exe" -ArgumentList "/c $uninstallCmd" -Wait
+        }
+
+        if ($uninstallCmd) {
+            Start-Process -FilePath "cmd.exe" -ArgumentList @('/c', $uninstallCmd) -Wait
         }
     }
 }
@@ -119,10 +122,10 @@ Write-Host "------------------------------------------------------------" -Foreg
 getInstallerFiles
 Write-Host "正在启动自动安装向导。安装位置为：$location、仅为本用户安装：$currentUser…" -ForegroundColor Yellow
 if ($currentUser) {
-    Invoke-Expression -Command "`"$Global:clientFilePath`" /CurrentUser /S /D=$location"
+    Start-Process -FilePath $Global:clientFilePath -ArgumentList @('/CurrentUser', '/S', "/D=$location") -Wait
     $shortcutLocation = [Environment]::GetFolderPath("Desktop") + "\TeamSpeak 3 Client.lnk"
 } else {
-    Invoke-Expression -Command "`"$Global:clientFilePath`" /S /D=$location"
+    Start-Process -FilePath $Global:clientFilePath -ArgumentList @('/S', "/D=$location") -Wait
     $shortcutLocation = [Environment]::GetFolderPath("CommonDesktopDirectory") + "\TeamSpeak 3 Client.lnk"
 }
 Write-Host "正在安装中，请稍后…" -ForegroundColor Yellow
@@ -130,7 +133,7 @@ while (!(Test-Path "$shortcutLocation")) {
     Start-Sleep 1
 }
 Write-Host "安装结束，正在启动 TeamSpeak 3…" -ForegroundColor Green
-Invoke-Expression -Command "& '$shortcutLocation'"
+Start-Process -FilePath $shortcutLocation
 uninstallOverwolf
 
 Write-Host ""
@@ -138,7 +141,7 @@ Write-Host "------------------------------------------------------------" -Foreg
 Write-Host "* [1]安装 TS3 > [2]安装汉化包 > [3] 完成" -ForegroundColor Green
 Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
 Write-Host "正在启动汉化包安装向导。请手动互动界面来安装汉化包…" -ForegroundColor Green
-Invoke-Expression -Command "`"$Global:zhCNTranslationFilePath`""
+Start-Process -FilePath $Global:zhCNTranslationFilePath -Wait
 
 Write-Host ""
 Write-Host "------------------------------------------------------------" -ForegroundColor DarkGray
