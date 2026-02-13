@@ -19,7 +19,7 @@
     简易使用命令。
 
     .EXAMPLE
-    iex "& {$(irm https://gist.github.com/SummonHIM/83b2d102d184167c733d05226e1bc10a/raw/installTS3.ps1)} -ts3FileHost xxyyzz.com -location `"$env:LocalAPPData\Programs\TeamSpeak 3 Client`" -currentUser"
+    iex "& {$(irm https://gist.github.com/SummonHIM/83b2d102d184167c733d05226e1bc10a/raw/installTS3.ps1)} -location `"$env:LocalAPPData\Programs\TeamSpeak 3 Client`" -currentUser"
     全参数使用示例。
 
     .EXAMPLE
